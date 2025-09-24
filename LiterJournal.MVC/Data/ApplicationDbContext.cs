@@ -5,15 +5,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LiterJournal.MVC.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext(options)
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-            : base(options)
-        {
-        }
-
         public DbSet<Book> Books { get; set; }
         public DbSet<UserProfile> UserProfiles { get; set; }
+        public DbSet<UserBook> UserBooks { get; set; }
+        public DbSet<BookActivity> BookActivities { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -29,6 +26,21 @@ namespace LiterJournal.MVC.Data
                     .IsRequired()
                     .OnDelete(DeleteBehavior.Cascade);
                 });
+
+            builder.Entity<UserBook>()
+                .HasOne(ub => ub.UserProfile)
+                .WithMany(up => up.UserBooks)
+                .HasForeignKey(ub => ub.UserProfileId);
+
+            builder.Entity<UserBook>()
+                .HasOne(ub => ub.Book)
+                .WithMany()
+                .HasForeignKey(ub => ub.BookId);
+
+            builder.Entity<BookActivity>()
+                .HasOne(ba => ba.UserBook)
+                .WithMany(ub => ub.BookActivities)
+                .HasForeignKey(ba => ba.UserBookId);
         }
     }
 }
