@@ -5,7 +5,7 @@ using LiterJournal.MVC.Models;
 
 namespace LiterJournal.MVC.Controllers
 {
-    public class BooksController : Controller
+    public class BooksController : BaseController
     {
         private readonly ApplicationDbContext _context;
 
@@ -17,7 +17,23 @@ namespace LiterJournal.MVC.Controllers
         // GET: Books
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Books.ToListAsync());
+            try
+            {
+                var books = await _context.UserBooks
+                    .Where(ub => ub.UserProfile.UserId == CurrentUserId)
+                    .Select(ub => ub.Book)
+                    .Distinct()
+                    .ToListAsync();
+
+                return View(books);
+            }
+            catch (Exception ex)
+            {
+                // Configure logger
+                // _logger.LogError(ex, "Error retrieving books for user {UserId}", CurrentUserId);
+                return View("Error");
+                // Or return an error view with a user-friendly message
+            }
         }
 
         // GET: Books/Details/5

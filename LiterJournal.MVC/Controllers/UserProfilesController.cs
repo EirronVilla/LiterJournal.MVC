@@ -8,7 +8,7 @@ using System.Security.Claims;
 
 namespace LiterJournal.MVC.Controllers
 {
-    public class UserProfilesController : Controller
+    public class UserProfilesController : BaseController
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;

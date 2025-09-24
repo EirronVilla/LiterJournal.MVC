@@ -6,7 +6,7 @@ using LiterJournal.MVC.Models;
 
 namespace LiterJournal.MVC.Controllers
 {
-    public class BookActivitiesController : Controller
+    public class BookActivitiesController : BaseController
     {
         private readonly ApplicationDbContext _context;
 
