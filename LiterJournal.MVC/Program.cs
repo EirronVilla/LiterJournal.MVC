@@ -1,3 +1,4 @@
+using DotNetEnv;
 using LiterJournal.MVC.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +9,8 @@ namespace LiterJournal.MVC
     {
         public static void Main(string[] args)
         {
+            Env.Load();
+
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
