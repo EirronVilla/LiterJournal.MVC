@@ -44,7 +44,16 @@ namespace LiterJournal.MVC.Controllers
         // GET: BookActivities/Create
         public IActionResult Create()
         {
-            ViewData["UserBookId"] = new SelectList(_context.UserBooks, "Id", "Id");
+            var userBooks = _context.UserBooks
+                .Include(ub => ub.Book) // make sure Book is loaded
+                .Select(ub => new
+                {
+                    ub.Id,
+                    DisplayText = ub.Book.Title + " by " + ub.Book.Author
+                })
+                .ToList();
+
+            ViewData["UserBookId"] = new SelectList(userBooks, "Id", "DisplayText");
             return View();
         }
 

@@ -1,4 +1,5 @@
 ﻿using LiterJournal.MVC.Enums;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations;
 
 namespace LiterJournal.MVC.Models
@@ -8,6 +9,11 @@ namespace LiterJournal.MVC.Models
         [Key]
         public int Id { get; set; }
         public int UserBookId { get; set; }
+
+        /// <summary>
+        /// Navigation property for the user book associated with this activity.
+        /// </summary>
+        [ValidateNever]
         public UserBook UserBook { get; set; }
         public DateTime ActivityDate { get; set; }
         public ActivityType ActivityType { get; set; }

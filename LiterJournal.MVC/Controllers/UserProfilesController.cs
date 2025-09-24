@@ -1,17 +1,24 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using LiterJournal.MVC.Data;
+﻿using LiterJournal.MVC.Data;
 using LiterJournal.MVC.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 
 namespace LiterJournal.MVC.Controllers
 {
     public class UserProfilesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public UserProfilesController(ApplicationDbContext context)
+        public UserProfilesController(
+            ApplicationDbContext context,
+            UserManager<IdentityUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: UserProfiles
@@ -49,13 +56,34 @@ namespace LiterJournal.MVC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,UserId,FullName,DisplayName,Bio,ProfilePictureUrl")] UserProfile userProfile)
+        public async Task<IActionResult> Create([Bind("Id,FullName,DisplayName,Bio,ProfilePictureUrl")] UserProfile userProfile)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(userProfile);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    string userId = null;
+                    if (User.Identity?.IsAuthenticated ?? false)
+                    {
+                        userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    }
+
+                    if (userId.IsNullOrEmpty())
+                    {
+                        return Unauthorized();
+                    }
+
+                    userProfile.UserId = userId;
+                    _context.Add(userProfile);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                } 
+                catch(DbUpdateException ex)
+                {
+                    ModelState.AddModelError(string.Empty, "An error occurred while saving the profile. Please try again.");
+                    return View(userProfile);
+
+                }
             }
             return View(userProfile);
         }
