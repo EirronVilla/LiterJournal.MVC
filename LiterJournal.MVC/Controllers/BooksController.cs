@@ -8,10 +8,14 @@ namespace LiterJournal.MVC.Controllers
     public class BooksController : BaseController
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger _logger;
 
-        public BooksController(ApplicationDbContext context)
+        public BooksController(
+            ApplicationDbContext context,
+            ILogger logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: Books
@@ -29,10 +33,8 @@ namespace LiterJournal.MVC.Controllers
             }
             catch (Exception ex)
             {
-                // Configure logger
-                // _logger.LogError(ex, "Error retrieving books for user {UserId}", CurrentUserId);
+                _logger.LogError(ex, "Error retrieving books for user {UserId}", CurrentUserId);
                 return View("Error");
-                // Or return an error view with a user-friendly message
             }
         }
 
